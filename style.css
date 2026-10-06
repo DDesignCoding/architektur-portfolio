@@ -1,1 +1,197 @@
+/* ==========================================================
+   style.css – Aussehen der Seite
+   ========================================================== */
 
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #7a7a7a;
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --tile-w: clamp(110px, 12.5vw, 220px);   /* Breite aller Bilder – alle gleich groß */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* ---------- Headline (groß, zentriert) ---------- */
+.center {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  text-align: center;
+  padding: 0 6vw;
+}
+.center > * {
+  grid-area: 1 / 1;
+  transition: opacity .6s var(--ease), transform .7s var(--ease);
+}
+
+.hero h1 {
+  font-weight: 300;
+  font-size: clamp(2.6rem, 8.5vw, 9rem);
+  letter-spacing: -0.04em;
+  line-height: .95;
+}
+.hero p {
+  margin-top: 1.6rem;
+  color: var(--muted);
+  font-size: .8rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+/* Projekt-Titel (erscheint beim Hover, ersetzt die Headline) */
+.focus-title {
+  opacity: 0;
+  transform: translateY(24px);
+}
+.focus-title .num {
+  display: block;
+  color: var(--muted);
+  font-size: .8rem;
+  letter-spacing: .22em;
+  margin-bottom: 1.2rem;
+}
+.focus-title h2 {
+  font-weight: 300;
+  font-size: clamp(2.2rem, 6.5vw, 7rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+body.has-focus .hero        { opacity: 0; transform: translateY(-24px); }
+body.has-focus .focus-title { opacity: 1; transform: none; }
+
+/* ---------- Kontakt (unten rechts) ---------- */
+.contact {
+  position: fixed;
+  right: 2.5rem;
+  bottom: 2.5rem;
+  z-index: 30;
+  text-align: right;
+  font-size: .9rem;
+  line-height: 1.6;
+}
+.contact a {
+  color: var(--fg);
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size .4s var(--ease);
+}
+.contact a:hover { background-size: 100% 1px; }
+.contact small {
+  display: block;
+  color: var(--muted);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  font-size: .7rem;
+  margin-bottom: .3rem;
+}
+
+/* ---------- Bühne mit Bildern ---------- */
+.stage { position: fixed; inset: 0; }
+
+.tile {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--tile-w);
+  aspect-ratio: 4 / 5;                       /* gleiches Format für alle */
+  margin-left: calc(var(--tile-w) / -2);     /* x/y = Mittelpunkt des Bildes */
+  margin-top: calc(var(--tile-w) * -0.625);
+  will-change: transform;
+  z-index: 1;
+}
+.tile:hover, .tile:focus-within { z-index: 10; }
+
+.tile a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #eee;
+  outline: none;
+  transition:
+    transform .7s var(--ease),
+    opacity .6s var(--ease),
+    box-shadow .7s var(--ease);
+  /* Einblend-Animation beim Laden: Bild "wächst" von unten nach oben */
+  animation: reveal 1.1s var(--ease) backwards;
+  animation-delay: calc(var(--i) * .12s + .1s);
+}
+
+@keyframes reveal {
+  from { clip-path: inset(100% 0 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+
+.tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(1) contrast(1.05);
+  transform: scale(1.08);
+  transition: filter .7s var(--ease), transform 1.1s var(--ease);
+}
+
+/* Fokus-Zustand beim Hover */
+.tile:hover a,
+.tile:focus-within a {
+  transform: scale(1.1);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .18);
+}
+.tile:hover img,
+.tile:focus-within img {
+  filter: grayscale(0) contrast(1);
+  transform: scale(1);
+}
+
+/* Die anderen Bilder treten zurück */
+.stage.has-focus .tile:not(.is-active) a { opacity: .15; }
+
+/* ---------- Positionen (Mittelpunkte) rund um die Headline ---------- */
+.tile:nth-child(1) { --x: 14vw; --y: 28vh; }
+.tile:nth-child(2) { --x: 50vw; --y: 15vh; }
+.tile:nth-child(3) { --x: 86vw; --y: 30vh; }
+.tile:nth-child(4) { --x: 24vw; --y: 80vh; }
+.tile:nth-child(5) { --x: 74vw; --y: 78vh; }
+
+/* ---------- Mobile / Touch: Raster ohne Mausbewegung ---------- */
+@media (max-width: 760px) {
+  html, body { overflow: auto; }
+  .center {
+    position: static;
+    min-height: 55vh;
+    padding: 6rem 1.5rem 2rem;
+  }
+  .stage {
+    position: static;
+    padding: 0 1.5rem 7rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .tile {
+    position: relative;
+    left: auto; top: auto;
+    width: 100%;
+    margin: 0;
+    transform: none !important;
+  }
+  .contact { right: 1.5rem; bottom: 1.5rem; background: var(--bg); padding: .6rem 0 0 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; animation: none !important; }
+}
